@@ -29,15 +29,22 @@ ENV DISPLAY=:1
 ENV SCREEN_WIDTH=1280
 ENV SCREEN_HEIGHT=720
 
+
+
+RUN apt-get update && apt-get install -y xterm
+
+
 RUN echo '#!/bin/bash' > /home/render/start.sh && \
+    echo 'rm -f /tmp/.X1-lock' >> /home/render/start.sh && \
     echo 'Xvfb :1 -screen 0 ${SCREEN_WIDTH}x${SCREEN_HEIGHT}x24 &' >> /home/render/start.sh && \
-    echo 'sleep 2' >> /home/render/start.sh && \
+    echo 'sleep 3' >> /home/render/start.sh && \
     echo 'fluxbox &' >> /home/render/start.sh && \
-    echo 'x11vnc -display :1 -nopw -forever -shared &' >> /home/render/start.sh && \
+    echo 'sleep 2' >> /home/render/start.sh && \
+    echo 'x11vnc -display :1 -nopw -forever -shared -bg -rfbport 5900' >> /home/render/start.sh && \
+    echo 'sleep 2' >> /home/render/start.sh && \
     echo '/usr/share/novnc/utils/launch.sh --vnc localhost:5900 --listen 8080 &' >> /home/render/start.sh && \
+    echo 'xterm -geometry 80x24+10+10 &' >> /home/render/start.sh && \
     echo 'steam -no-browser +open steam://open/minigameslist' >> /home/render/start.sh && \
     chmod +x /home/render/start.sh
-
-EXPOSE 8080
 
 CMD ["/home/render/start.sh"]

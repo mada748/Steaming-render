@@ -19,23 +19,24 @@ RUN wget https://repo.steampowered.com/steam/archive/precise/steam_latest.deb &&
     apt-get install -y ./steam_latest.deb || apt-get install -fy && \
     rm steam_latest.deb
 
+
 RUN useradd -m render && \
     echo "render ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 USER render
 WORKDIR /home/render
 
-
 ENV DISPLAY=:1
 ENV SCREEN_WIDTH=1280
 ENV SCREEN_HEIGHT=720
 
-RUN echo "#!/bin/bash\n\
-Xvfb :1 -screen 0 \${SCREEN_WIDTH}x\${SCREEN_HEIGHT}x24 &\n\
-sleep 2\n\
-fluxbox &\n\
-x11vnc -display :1 -nopw -forever -shared &\n\
-/usr/share/novnc/utils/launch.sh --vnc localhost:5900 --listen 8080 &\n\
-steam" > /home/render/start.sh && chmod +x /home/render/start.sh steam -no-browser +open steam://open/minigameslist
+RUN echo '#!/bin/bash' > /home/render/start.sh && \
+    echo 'Xvfb :1 -screen 0 ${SCREEN_WIDTH}x${SCREEN_HEIGHT}x24 &' >> /home/render/start.sh && \
+    echo 'sleep 2' >> /home/render/start.sh && \
+    echo 'fluxbox &' >> /home/render/start.sh && \
+    echo 'x11vnc -display :1 -nopw -forever -shared &' >> /home/render/start.sh && \
+    echo '/usr/share/novnc/utils/launch.sh --vnc localhost:5900 --listen 8080 &' >> /home/render/start.sh && \
+    echo 'steam -no-browser +open steam://open/minigameslist' >> /home/render/start.sh && \
+    chmod +x /home/render/start.sh
 
 EXPOSE 8080
 

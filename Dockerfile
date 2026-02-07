@@ -3,9 +3,14 @@ FROM ubuntu:22.04
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-
 RUN dpkg --add-architecture i386 && \
-    apt-get update && apt-get install -y \
+    apt-get update && \
+    apt-get install -y software-properties-common && \
+    add-apt-repository multiverse && \
+    apt-get update && \
+    echo steam steam/question select "I AGREE" | debconf-set-selections && \
+    echo steam steam/license note "" | debconf-set-selections && \
+    apt-get install -y \
     bash \
     fluxbox \
     novnc \
@@ -14,11 +19,9 @@ RUN dpkg --add-architecture i386 && \
     wget \
     libgl1-mesa-dri:i386 \
     libgl1-mesa-glx:i386 \
-    libsteam-runtime-launcher-service-host-bin:i386 \
     steam:i386 \
     python3 \
     && rm -rf /var/lib/apt/lists/*
-
 
 ENV DISPLAY=:1
 ENV SCREEN_WIDTH=1280

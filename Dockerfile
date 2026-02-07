@@ -12,26 +12,23 @@ RUN apt-get update && apt-get install -y \
     git \
     wget \
     firefox \
+    net-tools \
     && apt-get clean
 
 RUN git clone https://github.com/novnc/noVNC.git /opt/noVNC && \
-    git clone https://github.com/novnc/websockify.git /opt/noVNC/utils/websockify
-    
+    git clone https://github.com/novnc/websockify.git /opt/noVNC/utils/websockify && \
+    cp /opt/noVNC/vnc.html /opt/noVNC/index.html
+
 RUN echo '#!/bin/bash\n\
-# 1. Start virtual display\n\
+rm -f /tmp/.X1-lock\n\
 Xvfb :1 -screen 0 1024x768x16 &\n\
-sleep 2\n\
+sleep 3\n\
 export DISPLAY=:1\n\
-\n\
-# 2. Start Desktop Environment\n\
-startxfce4 &\n\
-\n\
-# 3. Start VNC Server\n\
-x11vnc -display :1 -nopw -forever -shared -rfbport 5900 &\n\
-sleep 2\n\
-\n\
-# 4. Start the Proxy\n\
-# Notice we call the python script INSIDE the directory specifically\n\
+dbus-launch startxfce4 &\n\
+x11vnc -display :1 -nopw -forever -shared -rfbport 5900 -localhost &\n\
+while ! nc -z localhost 5900; do\n\
+  sleep 1\n\
+done\n\
 /opt/noVNC/utils/websockify/run --web /opt/noVNC $PORT localhost:5900' > /entrypoint.sh
 
 RUN chmod +x /entrypoint.sh

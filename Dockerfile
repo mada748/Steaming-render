@@ -2,7 +2,6 @@ FROM ubuntu:22.04
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-
 RUN dpkg --add-architecture i386 && \
     apt-get update && \
     apt-get install -y \
@@ -20,9 +19,12 @@ RUN dpkg --add-architecture i386 && \
 RUN useradd -m render && \
     echo "render ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 
+
 ENV DISPLAY=:1
 ENV SCREEN_WIDTH=1280
 ENV SCREEN_HEIGHT=720
+ENV QT_X11_NO_MITSHM=1
+ENV _X11_NO_MITSHM=1
 
 
 RUN echo '#!/bin/bash\n\
@@ -34,8 +36,9 @@ sleep 2\n\
 x11vnc -display :1 -nopw -forever -shared -bg -rfbport 5900\n\
 sleep 2\n\
 /usr/share/novnc/utils/launch.sh --vnc localhost:5900 --listen 8080 &\n\
-xterm -geometry 80x24+10+10 &\n\
-steam -no-browser +open steam://open/minigameslist' > /home/render/start.sh && \
+sleep 2\n\
+# Launch Steam with sandbox disabled to bypass the Namespace error\n\
+steam -no-browser -no-sandbox +open steam://open/minigameslist' > /home/render/start.sh && \
     chmod +x /home/render/start.sh && \
     chown render:render /home/render/start.sh
 

@@ -35,7 +35,7 @@ sleep 2\n\
 fluxbox &\n\
 x11vnc -display :1 -nopw -forever -shared &\n\
 /usr/share/novnc/utils/launch.sh --vnc localhost:5900 --listen 8080 &\n\
-steam" > /home/render/start.sh && chmod +x /home/render/start.sh
+steam" > /home/render/start.sh && chmod +x /home/render/start.sh steam -no-browser +open steam://open/minigameslist
 
 EXPOSE 8080
 
